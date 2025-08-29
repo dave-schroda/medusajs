@@ -1,24 +1,22 @@
 // medusa-config.ts
-import { defineConfig } from "@medusajs/framework";
+import { loadEnv, defineConfig } from '@medusajs/framework/utils'
 
-export default defineConfig({
+loadEnv(process.env.NODE_ENV || 'development', process.cwd())
+
+module.exports = defineConfig({
   projectConfig: {
-    // Let envs drive prod/runtime behavior
-    workerMode: (process.env.MEDUSA_WORKER_MODE as "shared" | "server" | "worker") ?? "server",
-    redisUrl: process.env.REDIS_URL, // ok if undefined while testing
+    databaseUrl: process.env.DATABASE_URL,
+    // run a server or worker instance depending on env
+    workerMode: (process.env.MEDUSA_WORKER_MODE as 'shared' | 'server' | 'worker') || 'server',
+    // optional but recommended in prod (Railway Redis URL)
+    redisUrl: process.env.REDIS_URL,
+
     http: {
-      cors: {
-        // allowlist your origins; empty arrays are fine during first boot
-        store: (process.env.STORE_CORS ?? "").split(",").filter(Boolean),
-        admin: (process.env.ADMIN_CORS ?? "").split(",").filter(Boolean),
-        auth: (process.env.AUTH_CORS ?? "").split(",").filter(Boolean),
-      },
+      storeCors: process.env.STORE_CORS!,
+      adminCors: process.env.ADMIN_CORS!,
+      authCors: process.env.AUTH_CORS!,
+      jwtSecret: process.env.JWT_SECRET || 'supersecret',
+      cookieSecret: process.env.COOKIE_SECRET || 'supersecret',
     },
   },
-
-  // Built-in Admin UI (served at <BACKEND_URL>/app when not disabled)
-  admin: {
-    disable: process.env.DISABLE_MEDUSA_ADMIN === "true",
-    backendUrl: process.env.MEDUSA_BACKEND_URL, // set to https://<your-railway-domain>
-  },
-});
+})
