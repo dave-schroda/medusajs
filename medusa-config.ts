@@ -1,3 +1,4 @@
+// medusa-config.ts
 import { loadEnv, defineConfig } from '@medusajs/framework/utils'
 loadEnv(process.env.NODE_ENV || 'production', process.cwd())
 
@@ -15,7 +16,7 @@ module.exports = defineConfig({
     },
   },
   admin: {
-    disable: true,           // <— force off to prove it
-    path: process.env.ADMIN_PATH || '/app',
+    disable: true as const,   // keep admin off for now
+    // no `path` here
   },
 })
